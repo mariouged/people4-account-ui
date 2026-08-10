@@ -10,6 +10,6 @@ RUN npm ci
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 5173
 
 CMD ["npx", "vite", "--host", "172.31.0.5"]

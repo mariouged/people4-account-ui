@@ -33,3 +33,11 @@ export async function verifyTwoFactor({ code }) {
   }
   return { success: true, token: 'mock-jwt-token-authenticated' };
 }
+
+export async function headersAndCookiesGenerate({ headers, cookies }) {
+  await delay(MOCK_DELAY_MS);
+  // Mock implementation — replace with real headers and cookies generation logic
+  // TODO fetch
+  // PUT http://${ACCOUNT_API_HOST}:${PORT}/headersAndCookies
+  return { success: true, token: 'mock-jwt-token-authenticated' };
+}

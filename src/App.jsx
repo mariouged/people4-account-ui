@@ -3,8 +3,24 @@ import SignupForm from './components/SignupForm';
 import SigninForm from './components/SigninForm';
 import TwoFactorForm from './components/TwoFactorForm';
 import Dashboard from './components/Dashboard';
+import { headersAndCookiesGenerate } from './services/api';
 
 function App() {
+
+  const initHeadersAndCookies = async () => {
+    // Initialize headers and cookies for API requests if needed
+    // This can include setting default headers, tokens, etc.
+    try {
+      // TODO response
+      await headersAndCookiesGenerate({ "headers": "", "cookies": "" });
+    } catch (err) {
+      setStatus('error');
+      setError(err.message || 'Verification failed. Please try again.');
+    }
+  };
+
+  initHeadersAndCookies();
+
   return (
     <BrowserRouter>
       <div className="app">

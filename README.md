@@ -20,3 +20,9 @@ Form to sigin with email and password
 
 ## dashboard - home
 TODO show a TODO dashboard
+
+## DEV
+npx vite --host 172.32.0.30 --mode development
+
+## PROD
+npx vite build

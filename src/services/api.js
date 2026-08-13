@@ -1,8 +1,5 @@
 /* Mock API service — replace with real account-api fetch calls when available */
 
-const ACCOUNT_API_HOST = import.meta.env.VITE_ACCOUNT_API_HOST || 'localhost';
-const ACCOUNT_API_PORT = import.meta.env.VITE_ACCOUNT_API_PORT || '8080';
-
 const MOCK_DELAY_MS = 600;
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -67,10 +64,8 @@ function setAuthenticationXToken(headersAndCookies) {
 }
 
 async function fetchHeadersAndCookies() {
-  console.log(`API Host: ${ACCOUNT_API_HOST}, API Port: ${ACCOUNT_API_PORT}`);
   try {
-    // TODO FIX CORS
-    const response = await fetch(`http://${ACCOUNT_API_HOST}:${ACCOUNT_API_PORT}/headersAndCookies`, {
+    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/headersAndCookies`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

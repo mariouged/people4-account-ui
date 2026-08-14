@@ -5,6 +5,9 @@ const MOCK_DELAY_MS = 600;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function signup({ legalName, vatId, domain, email, password }) {
+  await mainHeadersAndCookies();
+
+  // TODO: Replace with real API call to account-api
   await delay(MOCK_DELAY_MS);
   if (email === 'taken@example.com') {
     const err = new Error('Email already registered');
@@ -15,13 +18,8 @@ export async function signup({ legalName, vatId, domain, email, password }) {
 }
 
 export async function signin({ email, password }) {
-  // TODO move into a separate function
-  const session_id = readCookie('session_id');
-  if (!session_id || !getAuthenticationXToken()) {
-    const headersAndCookies = await fetchHeadersAndCookies();
-    setCookie('session_id', headersAndCookies.session_id);
-    setAuthenticationXToken(headersAndCookies);
-  }
+  await mainHeadersAndCookies();
+
   // TODO: Replace with real API call to account-api
   await delay(MOCK_DELAY_MS);
   if (email === 'wrong@example.com') {
@@ -42,6 +40,16 @@ export async function verifyTwoFactor({ code }) {
   return { success: true, token: 'mock-jwt-token-authenticated' };
 }
 
+async function mainHeadersAndCookies() {
+  const session_id = readCookie('session_id');
+  if (!session_id || !getSessionStorageItem('x_request_id') || !getSessionStorageItem('x_id')) {
+    const headersAndCookies = await fetchHeadersAndCookies();
+    setCookie('session_id', headersAndCookies.session_id);
+    setSessionStorageItem('x_request_id', headersAndCookies.x_request_id);
+    setSessionStorageItem('x_id', headersAndCookies.id);
+  }
+}
+
 function readCookie(name) {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
   if (match) return match[2];
@@ -53,14 +61,20 @@ function setCookie(name, value) {
   document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
 }
 
-function getAuthenticationXToken() {
-  return sessionStorage.getItem('x_token');
+function getSessionStorageItem(key) {
+  if (!window.sessionStorage) {
+    console.warn('sessionStorage is not available in this environment.');
+    return null;
+  }
+  return sessionStorage.getItem(key);
 }
 
-function setAuthenticationXToken(headersAndCookies) {
-  // Store the token in localStorage or a cookie for future API requests
-  const x_token = headersAndCookies.x_request_id + '.' + headersAndCookies.id;
-  sessionStorage.setItem('x_token', x_token);
+function setSessionStorageItem(key, value) {
+  if (!window.sessionStorage) {
+    console.warn('sessionStorage is not available in this environment.');
+    return;
+  }
+  sessionStorage.setItem(key, value);
 }
 
 async function fetchHeadersAndCookies() {
@@ -72,11 +86,9 @@ async function fetchHeadersAndCookies() {
       },
       body: JSON.stringify({}),
     });
-    const data = await response.json();
-    console.log('Headers and cookies fetched:', data);
-    return data;
+    const headersAndCookies = await response.json();
+    return headersAndCookies;
   } catch (err) {
-    setStatus('error');
-    setError(err.message || 'fetch headers and cookies failed');
+    console.error(err.message || 'fetch headers and cookies failed');
   }
 }

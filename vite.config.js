@@ -5,9 +5,11 @@ export default defineConfig({
   base: '/account-ui',
   plugins: [react()],
   server: {
-    cors: {
-      origin: 'https://api.people4.eu/account-api',
-    }
+    allowedHosts: ['app.people4.eu'],
+    config: {
+      host: 'app.people4.eu',
+      port: 5173,
+    },
   },
   build: {
     outDir: 'dist',

@@ -20,14 +20,34 @@ export async function signup({ legalName, vatId, domain, email, password }) {
 export async function signin({ email, password }) {
   await mainHeadersAndCookies();
 
-  // TODO: Replace with real API call to account-api
-  await delay(MOCK_DELAY_MS);
-  if (email === 'wrong@example.com') {
-    const err = new Error('Invalid credentials');
-    err.status = 401;
+  let success = false, requiresTwoFactor = false;
+  try {
+    const BearerToken = generateBearerToken();
+    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/signin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BearerToken}`,
+        'X-Session-Id': readCookie('session_id') || '',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+    const res = await response.json();
+    if (res.token) {
+      success = true;
+      requiresTwoFactor = true;
+      setSessionStorageItem('token', res.token);
+    }
+  } catch (err) {
+    console.error(err.message || 'signin failed');
+    err.status = err.status || 401;
     throw err;
   }
-  return { success: true, requiresTwoFactor: true };
+
+  return { success, requiresTwoFactor };
 }
 
 export async function verifyTwoFactor({ code }) {
@@ -87,8 +107,16 @@ async function fetchHeadersAndCookies() {
       body: JSON.stringify({}),
     });
     const headersAndCookies = await response.json();
+    if (!headersAndCookies.session_id || !headersAndCookies.x_request_id || !headersAndCookies.id) {
+      throw new Error('Missing required headers or cookies in response');
+    }
     return headersAndCookies;
   } catch (err) {
     console.error(err.message || 'fetch headers and cookies failed');
+    throw err;
   }
+}
+
+function generateBearerToken() {
+  return getSessionStorageItem('x_request_id') + '.' + getSessionStorageItem('x_id');
 }

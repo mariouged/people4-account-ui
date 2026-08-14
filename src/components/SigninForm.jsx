@@ -32,8 +32,10 @@ function SigninForm() {
     setStatus('loading');
     setApiMessage('');
     try {
-      await signin(fields);
-      navigate('/two-factor');
+      const result = await signin(fields);
+      if (result.requiresTwoFactor) {
+        navigate('/two-factor');
+      }
     } catch (err) {
       setStatus('error');
       setApiMessage(err.message || 'Sign in failed. Please try again.');

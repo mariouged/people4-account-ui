@@ -6,7 +6,7 @@ import Dashboard from './components/Dashboard';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/account-ui">
       <div className="app">
         <header className="app-header">
           <h1>Easy Compliance</h1>

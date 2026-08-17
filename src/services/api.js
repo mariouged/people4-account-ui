@@ -74,23 +74,54 @@ export async function signin({ email, password }) {
 }
 
 export async function verifyTwoFactor({ code }) {
-  await delay(MOCK_DELAY_MS);
+  if (!hasHeadersAndCookies()) {
+    const err = new Error('Invalid code. H0-01');
+    err.status = 400;
+    throw err;
+  }
   if (!/^\d{6}$/.test(code)) {
     const err = new Error('Invalid code. Enter the 6-digit code.');
     err.status = 400;
     throw err;
   }
-  return { success: true, token: 'mock-jwt-token-authenticated' };
+  let success = false;
+  try {
+    const BearerToken = generateBearerToken();
+    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/verifyTwoFactor`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BearerToken}`,
+        'X-Session-Id': getSessionStorageItem('session_id') || '',
+      },
+      body: JSON.stringify({
+        code,
+      }),
+    });
+    const res = await response.json();
+    if (res.success) {
+      success = true;
+      // TODO setSessionStorageItem('token', res.token);
+    }
+  } catch (err) {
+    console.error(err.message || 'signin failed');
+    err.status = err.status || 401;
+    throw err;
+  }
+  return { success, token: getSessionStorageItem('token') || 'mock-jwt-token-authenticated' };
 }
 
 async function mainHeadersAndCookies() {
-  const hasHeadersAndCookies = getSessionStorageItem('session_id') && getSessionStorageItem('x_request_id') && getSessionStorageItem('x_id');
-  if (!hasHeadersAndCookies) {
+  if (!hasHeadersAndCookies()) {
     const headersAndCookies = await fetchHeadersAndCookies();
     setSessionStorageItem('session_id', headersAndCookies.session_id);
     setSessionStorageItem('x_request_id', headersAndCookies.x_request_id);
     setSessionStorageItem('x_id', headersAndCookies.id);
   }
+}
+
+function hasHeadersAndCookies() {
+  return getSessionStorageItem('session_id') && getSessionStorageItem('x_request_id') && getSessionStorageItem('x_id');
 }
 
 function getSessionStorageItem(key) {

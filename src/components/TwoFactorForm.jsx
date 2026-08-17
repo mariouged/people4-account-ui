@@ -17,8 +17,10 @@ function TwoFactorForm() {
     setStatus('loading');
     setError('');
     try {
-      await verifyTwoFactor({ code });
-      navigate('/dashboard');
+      const result = await verifyTwoFactor({ code });
+      if (result.success) {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setStatus('error');
       setError(err.message || 'Verification failed. Please try again.');

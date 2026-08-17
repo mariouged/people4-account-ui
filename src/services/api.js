@@ -7,14 +7,37 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function signup({ legalName, vatId, domain, email, password }) {
   await mainHeadersAndCookies();
 
-  // TODO: Replace with real API call to account-api
-  await delay(MOCK_DELAY_MS);
-  if (email === 'taken@example.com') {
-    const err = new Error('Email already registered');
-    err.status = 409;
+  let success = false, message = 'Create account failed. Please retry.'
+  try {
+    const BearerToken = generateBearerToken();
+    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BearerToken}`,
+        'X-Session-Id': getSessionStorageItem('session_id') || '',
+      },
+      body: JSON.stringify({
+        domain,
+        legalName,
+        vatId,
+        email,
+        password,
+      }),
+    });
+    const res = await response.json();
+    if (res.apiKey) {
+      setSessionStorageItem('apiKey', res.apiKey);
+      success = true;
+      message = 'Account created successfully. Please check your email for verification.';
+    }
+  } catch (err) {
+    console.error(err.message || 'signup failed');
+    err.status = err.status || 401;
     throw err;
   }
-  return { success: true, message: 'Account created. Please sign in.' };
+
+  return { success, message };
 }
 
 export async function signin({ email, password }) {

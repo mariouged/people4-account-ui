@@ -28,7 +28,7 @@ export async function signin({ email, password }) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${BearerToken}`,
-        'X-Session-Id': readCookie('session_id') || '',
+        'X-Session-Id': getSessionStorageItem('session_id') || '',
       },
       body: JSON.stringify({
         email,
@@ -61,24 +61,13 @@ export async function verifyTwoFactor({ code }) {
 }
 
 async function mainHeadersAndCookies() {
-  const session_id = readCookie('session_id');
-  if (!session_id || !getSessionStorageItem('x_request_id') || !getSessionStorageItem('x_id')) {
+  const hasHeadersAndCookies = getSessionStorageItem('session_id') && getSessionStorageItem('x_request_id') && getSessionStorageItem('x_id');
+  if (!hasHeadersAndCookies) {
     const headersAndCookies = await fetchHeadersAndCookies();
-    setCookie('session_id', headersAndCookies.session_id);
+    setSessionStorageItem('session_id', headersAndCookies.session_id);
     setSessionStorageItem('x_request_id', headersAndCookies.x_request_id);
     setSessionStorageItem('x_id', headersAndCookies.id);
   }
-}
-
-function readCookie(name) {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  if (match) return match[2];
-  return null;
-}
-
-function setCookie(name, value) {
-  const expires = new Date(Date.now() + 3600 * 1000).toUTCString();
-  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
 }
 
 function getSessionStorageItem(key) {

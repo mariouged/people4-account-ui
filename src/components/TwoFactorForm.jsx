@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { verifyTwoFactor } from '../services/api';
+import { verifyTwoFactor, createTwoFactor, getSessionStorageItem, signup, signin } from '../services/api';
 
 function TwoFactorForm() {
   const [code, setCode] = useState('');
@@ -17,9 +17,32 @@ function TwoFactorForm() {
     setStatus('loading');
     setError('');
     try {
-      const result = await verifyTwoFactor({ code });
-      if (result.success) {
+      const resultCreateTwoFactor = await createTwoFactor();
+      if (!resultCreateTwoFactor.success) {
+        setStatus('error');
+        setError(resultCreateTwoFactor.message || 'Failed to create two-factor authentication. Please try again.');
+        return;
+      }
+      const resTwoFactor = await verifyTwoFactor({ code });
+      if (!resTwoFactor.success) {
+        setStatus('error');
+        setError(resTwoFactor.message || 'Verification failed. Please try again.');
+        return;
+      }
+      const conversionFunnel = getSessionStorageItem('conversionFunnel');
+      if (conversionFunnel === 'signin') {
+        // TODO implement signin after 2FA verification
         navigate('/dashboard');
+        return;
+      }
+      if (conversionFunnel === 'signup') {
+        const signupFields = JSON.parse(getSessionStorageItem('signupFields') || '{}');
+        const { legalName, vatId, domain, email, password } = signupFields;
+        const fields = { legalName, vatId, domain, email, password };
+        const result = await signup(fields);
+        if (result.apiKey) {
+          navigate('/dashboard');
+        }
       }
     } catch (err) {
       setStatus('error');

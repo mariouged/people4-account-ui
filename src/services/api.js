@@ -5,9 +5,14 @@ const MOCK_DELAY_MS = 600;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function signup({ legalName, vatId, domain, email, password }) {
-  await mainHeadersAndCookies();
-
-  let success = false, message = 'Create account failed. Please retry.'
+  if (!hasHeadersAndCookies()) {
+    const err = new Error('Invalid code. H0-01');
+    err.status = 400;
+    throw err;
+  }
+  let success = false;
+  let apiKey = null;
+  let message = 'Create account failed. Please retry.';
   try {
     const BearerToken = generateBearerToken();
     const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/signup`, {
@@ -28,6 +33,7 @@ export async function signup({ legalName, vatId, domain, email, password }) {
     const res = await response.json();
     if (res.apiKey) {
       setSessionStorageItem('apiKey', res.apiKey);
+      apiKey = res.apiKey;
       success = true;
       message = 'Account created successfully. Please check your email for verification.';
     }
@@ -37,12 +43,15 @@ export async function signup({ legalName, vatId, domain, email, password }) {
     throw err;
   }
 
-  return { success, message };
+  return { success, apiKey, message };
 }
 
 export async function signin({ email, password }) {
-  await mainHeadersAndCookies();
-
+  if (!hasHeadersAndCookies()) {
+    const err = new Error('Invalid code. H0-01');
+    err.status = 400;
+    throw err;
+  }
   let success = false, requiresTwoFactor = false;
   try {
     const BearerToken = generateBearerToken();
@@ -95,7 +104,8 @@ export async function verifyTwoFactor({ code }) {
         'X-Session-Id': getSessionStorageItem('session_id') || '',
       },
       body: JSON.stringify({
-        code,
+        code: code,
+        email: getSessionStorageItem('email') || '',
       }),
     });
     const res = await response.json();
@@ -124,7 +134,7 @@ function hasHeadersAndCookies() {
   return getSessionStorageItem('session_id') && getSessionStorageItem('x_request_id') && getSessionStorageItem('x_id');
 }
 
-function getSessionStorageItem(key) {
+export function getSessionStorageItem(key) {
   if (!window.sessionStorage) {
     console.warn('sessionStorage is not available in this environment.');
     return null;
@@ -132,7 +142,7 @@ function getSessionStorageItem(key) {
   return sessionStorage.getItem(key);
 }
 
-function setSessionStorageItem(key, value) {
+export function setSessionStorageItem(key, value) {
   if (!window.sessionStorage) {
     console.warn('sessionStorage is not available in this environment.');
     return;
@@ -162,4 +172,39 @@ async function fetchHeadersAndCookies() {
 
 function generateBearerToken() {
   return getSessionStorageItem('x_request_id') + '.' + getSessionStorageItem('x_id');
+}
+
+export async function createTwoFactor() {
+  await mainHeadersAndCookies();
+  const email = getSessionStorageItem('email');
+  if (!email) {
+    const err = new Error('Email is required');
+    err.status = 400;
+    throw err;
+  }
+  let success = false;
+  try {
+    const BearerToken = generateBearerToken();
+    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/createTwoFactor`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BearerToken}`,
+        'X-Session-Id': getSessionStorageItem('session_id') || '',
+      },
+      body: JSON.stringify({
+        email
+      }),
+    });
+    const res = await response.json();
+    if (res.codeMock) {
+      success = true;
+      setSessionStorageItem('codeMock', res.codeMock);
+    }
+  } catch (err) {
+    console.error(err.message || 'createTwoFactor failed');
+    err.status = err.status || 401;
+    throw err;
+  }
+  return { success, codeMock: getSessionStorageItem('codeMock') || 'error' };
 }

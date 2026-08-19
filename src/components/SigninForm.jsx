@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signin } from '../services/api';
+import { signin, setSessionStorageItem } from '../services/api';
 
 function SigninForm() {
   const [fields, setFields] = useState({ email: '', password: '' });
@@ -31,6 +31,7 @@ function SigninForm() {
     }
     setStatus('loading');
     setApiMessage('');
+    setSessionStorageItem('conversionFunnel', 'signin');
     try {
       const result = await signin(fields);
       if (result.requiresTwoFactor) {

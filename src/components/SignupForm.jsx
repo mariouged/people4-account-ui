@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signup } from '../services/api';
+import { signup, setSessionStorageItem } from '../services/api';
 
 const INITIAL = { legalName: '', vatId: '', domain: '', email: '', password: '' };
 
@@ -38,17 +38,26 @@ function SignupForm() {
       setErrors(errs);
       return;
     }
-    setStatus('loading');
+    // NOT do the signup here, instead:
+    // store the fields in sessionStorage and navigate to /two-factor
+    setSessionStorageItem('signupFields', JSON.stringify(fields));
+    setSessionStorageItem('email', fields.email);
+    setSessionStorageItem('conversionFunnel', 'signup');
+    navigate('/two-factor');
+    /*setStatus('loading');
     setApiMessage('');
     try {
       const result = await signup(fields);
+      if (result.requiresTwoFactor) {
+        navigate('/two-factor');
+      }
       setStatus('success');
       setApiMessage(result.message);
-      setTimeout(() => navigate('/signin'), 2000);
+      navigate('/signin');
     } catch (err) {
       setStatus('error');
       setApiMessage(err.message || 'Something went wrong. Please try again.');
-    }
+    }*/
   };
 
   return (

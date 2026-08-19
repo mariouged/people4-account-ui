@@ -44,20 +44,6 @@ function SignupForm() {
     setSessionStorageItem('email', fields.email);
     setSessionStorageItem('conversionFunnel', 'signup');
     navigate('/two-factor');
-    /*setStatus('loading');
-    setApiMessage('');
-    try {
-      const result = await signup(fields);
-      if (result.requiresTwoFactor) {
-        navigate('/two-factor');
-      }
-      setStatus('success');
-      setApiMessage(result.message);
-      navigate('/signin');
-    } catch (err) {
-      setStatus('error');
-      setApiMessage(err.message || 'Something went wrong. Please try again.');
-    }*/
   };
 
   return (

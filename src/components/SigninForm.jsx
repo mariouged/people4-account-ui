@@ -29,10 +29,13 @@ function SigninForm() {
       setErrors(errs);
       return;
     }
-    setStatus('loading');
-    setApiMessage('');
+    // NOT do the signin here, instead:
+    // store the fields in sessionStorage and navigate to /two-factor
     setSessionStorageItem('conversionFunnel', 'signin');
-    try {
+    setSessionStorageItem('email', fields.email);
+    setSessionStorageItem('hashpass', fields.password);
+    navigate('/two-factor');
+    /*try {
       const result = await signin(fields);
       if (result.requiresTwoFactor) {
         navigate('/two-factor');
@@ -40,7 +43,7 @@ function SigninForm() {
     } catch (err) {
       setStatus('error');
       setApiMessage(err.message || 'Sign in failed. Please try again.');
-    }
+    }*/
   };
 
   return (

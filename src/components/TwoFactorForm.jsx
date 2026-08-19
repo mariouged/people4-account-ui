@@ -31,9 +31,18 @@ function TwoFactorForm() {
       }
       const conversionFunnel = getSessionStorageItem('conversionFunnel');
       if (conversionFunnel === 'signin') {
-        // TODO implement signin after 2FA verification
-        navigate('/dashboard');
-        return;
+        const result = await signin({
+          email: getSessionStorageItem('email'),
+          password: getSessionStorageItem('hashpass'),
+        });
+        if (result.token) {
+          navigate('/dashboard');
+          return;
+        } else {
+          setStatus('error');
+          setError(result.message || 'Sign in failed. Please try again.');
+          return;
+        }
       }
       if (conversionFunnel === 'signup') {
         const signupFields = JSON.parse(getSessionStorageItem('signupFields') || '{}');
@@ -42,6 +51,11 @@ function TwoFactorForm() {
         const result = await signup(fields);
         if (result.apiKey) {
           navigate('/dashboard');
+          return;
+        } else {
+          setStatus('error');
+          setError(result.message || 'Sign up failed. Please try again.');
+          return;
         }
       }
     } catch (err) {

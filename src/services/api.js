@@ -52,7 +52,7 @@ export async function signin({ email, password }) {
     err.status = 400;
     throw err;
   }
-  let success = false, requiresTwoFactor = false;
+  let token = '';
   try {
     const BearerToken = generateBearerToken();
     const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/signin`, {
@@ -69,9 +69,7 @@ export async function signin({ email, password }) {
     });
     const res = await response.json();
     if (res.token) {
-      success = true;
-      requiresTwoFactor = true;
-      setSessionStorageItem('token', res.token);
+      token = res.token;
     }
   } catch (err) {
     console.error(err.message || 'signin failed');
@@ -79,7 +77,7 @@ export async function signin({ email, password }) {
     throw err;
   }
 
-  return { success, requiresTwoFactor };
+  return { token };
 }
 
 export async function verifyTwoFactor({ code }) {

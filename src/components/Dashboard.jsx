@@ -1,9 +1,11 @@
+import InvoicesList from "./InvoicesList";
+
 function Dashboard() {
   return (
-    <div className="card">
+    <div className="dashboard">
       <h2>Dashboard</h2>
-      <div className="todo-notice">
-        <strong>TODO</strong> — Dashboard is not yet implemented.
+      <div className="todo-invoices-list-wrapper">
+        <InvoicesList />
       </div>
     </div>
   );

@@ -9,6 +9,9 @@ function InvoicesList() {
     const fetchInvoices = async () => {
       try {
         const token = localStorage.getItem("jwt");
+        if (!token) {
+          throw new Error("401 (Unauthorized) fetch invoices");
+        }
 
         const response = await fetch(
           "https://app.people4.eu/invoice-api/invoice/v1",

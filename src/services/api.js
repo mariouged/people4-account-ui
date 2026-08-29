@@ -128,7 +128,7 @@ async function mainHeadersAndCookies() {
   }
 }
 
-function hasHeadersAndCookies() {
+export function hasHeadersAndCookies() {
   return getSessionStorageItem('session_id') && getSessionStorageItem('x_request_id') && getSessionStorageItem('x_id');
 }
 

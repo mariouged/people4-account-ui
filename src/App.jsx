@@ -9,7 +9,7 @@ function App() {
     <BrowserRouter basename="/account-ui">
       <div className="app">
         <header className="app-header">
-          <h1>Easy Compliance</h1>
+          <h1>Simply Compliance</h1>
           <nav>
             <Link to="/signin">Sign In</Link>
             <Link to="/signup">Sign Up</Link>

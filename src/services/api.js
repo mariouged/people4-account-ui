@@ -224,7 +224,7 @@ export async function tokenRetrieve() {
   }
   try {
     const response = await fetch(`${import.meta.env.VITE_AUTH_API_URL_BASE}/token`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,

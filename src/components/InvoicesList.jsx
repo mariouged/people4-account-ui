@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { tokenRetrieve } from '../services/api';
 
 function InvoicesList() {
   const [invoices, setInvoices] = useState([]);
@@ -8,7 +9,7 @@ function InvoicesList() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const token = localStorage.getItem("jwt");
+        const token = await tokenRetrieve();
         if (!token) {
           throw new Error("401 (Unauthorized) fetch invoices");
         }

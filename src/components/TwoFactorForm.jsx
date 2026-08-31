@@ -35,7 +35,7 @@ function TwoFactorForm() {
           email: getSessionStorageItem('email'),
           password: getSessionStorageItem('hashpass'),
         });
-        if (result.token) {
+        if (result.apiKey) {
           navigate('/dashboard');
           return;
         } else {

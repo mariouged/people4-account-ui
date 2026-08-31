@@ -52,7 +52,7 @@ export async function signin({ email, password }) {
     err.status = 400;
     throw err;
   }
-  let token = '';
+  let apiKey = '';
   try {
     const BearerToken = generateBearerToken();
     const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/signin`, {
@@ -68,8 +68,12 @@ export async function signin({ email, password }) {
       }),
     });
     const res = await response.json();
-    if (res.token) {
-      token = res.token;
+    if (res.apiKey) {
+      apiKey = res.apiKey;
+      setSessionStorageItem('apiKey', res.apiKey);
+      setSessionStorageItem('domain', res.domain);
+      setSessionStorageItem('legalName', res.legalName);
+      setSessionStorageItem('vatId', res.vatId);
     }
   } catch (err) {
     console.error(err.message || 'signin failed');
@@ -77,7 +81,7 @@ export async function signin({ email, password }) {
     throw err;
   }
 
-  return { token };
+  return { apiKey };
 }
 
 export async function verifyTwoFactor({ code }) {
@@ -205,4 +209,41 @@ export async function createTwoFactor() {
     throw err;
   }
   return { success, codeMock: getSessionStorageItem('codeMock') || 'error' };
+}
+
+export async function tokenRetrieve() {
+  let token = getSessionStorageItem('token');
+  if (token) {
+    return token;
+  }
+  const apiKey = getSessionStorageItem('apiKey');
+  if (!apiKey) {
+    const err = new Error('API key is required');
+    err.status = 400;
+    throw err;
+  }
+  try {
+    const response = await fetch(`${import.meta.env.VITE_AUTH_API_URL_BASE}/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        domain: getSessionStorageItem('domain') || '',
+        legalName: getSessionStorageItem('legalName') || '',
+        vatId: getSessionStorageItem('vatId') || '',
+      }),
+    });
+    const res = await response.json();
+    if (res.token) {
+      token = res.token || '';
+      setSessionStorageItem('token', token);
+    }
+  } catch (err) {
+    console.error(err.message || 'createTwoFactor failed');
+    err.status = err.status || 401;
+    throw err;
+  }
+  return token;
 }

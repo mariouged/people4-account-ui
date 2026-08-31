@@ -33,6 +33,7 @@ function SigninForm() {
     // store the fields in sessionStorage and navigate to /two-factor
     setSessionStorageItem('conversionFunnel', 'signin');
     setSessionStorageItem('email', fields.email);
+    // TODO hashpasswd stored in var or cryptographically secured storage
     setSessionStorageItem('hashpass', fields.password);
     navigate('/two-factor');
     /*try {

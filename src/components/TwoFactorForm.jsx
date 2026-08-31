@@ -33,6 +33,7 @@ function TwoFactorForm() {
       if (conversionFunnel === 'signin') {
         const result = await signin({
           email: getSessionStorageItem('email'),
+          // TODO hashpasswd stored in var or cryptographically secured storage
           password: getSessionStorageItem('hashpass'),
         });
         if (result.apiKey) {

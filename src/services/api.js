@@ -33,6 +33,7 @@ export async function signup({ legalName, vatId, domain, email, password }) {
     const res = await response.json();
     if (res.apiKey) {
       setSessionStorageItem('apiKey', res.apiKey);
+      setSessionStorageItem('isAuthenticated', 'true');
       apiKey = res.apiKey;
       success = true;
       message = 'Account created successfully. Please check your email for verification.';
@@ -74,6 +75,8 @@ export async function signin({ email, password }) {
       setSessionStorageItem('domain', res.domain);
       setSessionStorageItem('legalName', res.legalName);
       setSessionStorageItem('vatId', res.vatId);
+
+      setSessionStorageItem('isAuthenticated', 'true');
     }
   } catch (err) {
     console.error(err.message || 'signin failed');
@@ -246,4 +249,15 @@ export async function tokenRetrieve() {
     throw err;
   }
   return token;
+}
+
+export async function signout() {
+  setSessionStorageItem('isAuthenticated', 'false');
+  setSessionStorageItem('apiKey', '');
+  setSessionStorageItem('token', '');
+  setSessionStorageItem('email', '');
+  setSessionStorageItem('hashpass', '');
+  setSessionStorageItem('domain', '');
+  setSessionStorageItem('legalName', '');
+  setSessionStorageItem('vatId', '');
 }

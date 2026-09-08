@@ -135,10 +135,12 @@ async function mainHeadersAndCookies() {
   }
 }
 
+// TODO remove @use utils.js
 export function hasHeadersAndCookies() {
   return getSessionStorageItem('session_id') && getSessionStorageItem('x_request_id') && getSessionStorageItem('x_id');
 }
 
+// TODO remove @use utils.js
 export function getSessionStorageItem(key) {
   if (!window.sessionStorage) {
     console.warn('sessionStorage is not available in this environment.');
@@ -175,6 +177,7 @@ async function fetchHeadersAndCookies() {
   }
 }
 
+// TODO remove @use utils.js
 function generateBearerToken() {
   return getSessionStorageItem('x_request_id') + '.' + getSessionStorageItem('x_id');
 }

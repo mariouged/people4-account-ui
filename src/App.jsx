@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import OrganizationForm from './components/OrganizationForm';
 import NavMenu from './components/NavMenu';
 import NavSign from './components/NavSign';
 import { useContext } from 'react';
@@ -28,6 +29,7 @@ function App() {
         <main className="app-main">
           <Routes>
             <Route path="/" element={<Navigate to="/signin" replace />} />
+            <Route path="/sign/organization" element={<OrganizationForm />} />
             <Route path="/signin" element={<SigninForm />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/signout" element={<SignOut />} />

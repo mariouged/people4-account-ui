@@ -8,10 +8,8 @@ import SigninForm from './components/SigninForm';
 import SignOut from './components/SignOut';
 import TwoFactorForm from './components/TwoFactorForm';
 import Dashboard from './components/Dashboard';
-import { AuthenticatedContext } from './context/AuthenticatedContext';
 
 function App() {
-  const isAuthenticated = useContext(AuthenticatedContext);
   const [account, setAccount] = useState(null);
 
   return (
@@ -37,7 +35,7 @@ function App() {
             <Route path="/signout" element={<SignOut setAccount={setAccount} />} />
             {account && (
               <>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard account={account} />} />
               </>
             )}
           </Routes>

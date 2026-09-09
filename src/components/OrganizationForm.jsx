@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import AccountContext from '../context/AccountContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { organizationSign } from '../services/organizationSign';
 
@@ -19,7 +18,6 @@ function OrganizationForm() {
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [apiMessage, setApiMessage] = useState('');
   const navigate = useNavigate();
-  const accountContext = useContext(AccountContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

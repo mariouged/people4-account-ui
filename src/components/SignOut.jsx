@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { signout } from '../services/api';
 
 function SignOut({ setAccount }) {

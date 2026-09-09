@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { signin, setSessionStorageItem } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { userSign } from '../services/userSign';
 
 function SigninForm() {
   const [fields, setFields] = useState({ email: '', password: '' });
@@ -29,28 +29,25 @@ function SigninForm() {
       setErrors(errs);
       return;
     }
-    // NOT do the signin here, instead:
-    // store the fields in sessionStorage and navigate to /two-factor
-    setSessionStorageItem('conversionFunnel', 'signin');
-    setSessionStorageItem('email', fields.email);
-    // TODO hashpasswd stored in var or cryptographically secured storage
-    setSessionStorageItem('hashpass', fields.password);
-    navigate('/two-factor');
-    /*try {
-      const result = await signin(fields);
-      if (result.requiresTwoFactor) {
-        navigate('/two-factor');
-      }
-    } catch (err) {
+    const result = await userSign({
+      email: fields.email,
+      // TODO crypto passwd https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
+      password: fields.password,
+    });
+    if (result.ok) {
+      navigate('/dashboard');
+      return;
+    } else {
       setStatus('error');
-      setApiMessage(err.message || 'Sign in failed. Please try again.');
-    }*/
+      setApiMessage(result.message || 'Sign in failed.');
+      return;
+    }
   };
 
   return (
     <div className="card">
       <h2>Sign In</h2>
-      <form className="form" onSubmit={handleSubmit} noValidate>
+      <form className="form" onSubmit={handleSubmit} noValidate autoComplete="on">
         <div className="field">
           <label htmlFor="email">Email</label>
           <input
@@ -91,9 +88,6 @@ function SigninForm() {
           {status === 'loading' ? 'Signing in…' : 'Sign In'}
         </button>
       </form>
-      <p className="form-footer">
-        No account yet? <Link to="/signup">Create one</Link>
-      </p>
     </div>
   );
 }

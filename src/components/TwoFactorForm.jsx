@@ -31,19 +31,7 @@ function TwoFactorForm() {
       }
       const conversionFunnel = getSessionStorageItem('conversionFunnel');
       if (conversionFunnel === 'signin') {
-        const result = await signin({
-          email: getSessionStorageItem('email'),
-          // TODO hashpasswd stored in var or cryptographically secured storage
-          password: getSessionStorageItem('hashpass'),
-        });
-        if (result.apiKey) {
-          navigate('/dashboard');
-          return;
-        } else {
-          setStatus('error');
-          setError(result.message || 'Sign in failed. Please try again.');
-          return;
-        }
+        
       }
       if (conversionFunnel === 'signup') {
         const signupFields = JSON.parse(getSessionStorageItem('signupFields') || '{}');

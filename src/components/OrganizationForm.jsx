@@ -35,8 +35,7 @@ function OrganizationForm() {
       return;
     }
     const result = await organizationSign(fields)
-    const organization = { ...result.organization };
-    if (organization.domain && organization.legalName && organization.vatId) {
+    if (result.ok) {
       setStatus('success');
       navigate('/signin');
     } else {
@@ -117,6 +116,9 @@ function OrganizationForm() {
           {status === 'loading' ? 'Loading...' : 'Login'}
         </button>
       </form>
+      <p className="form-footer">
+        No account yet? <Link to="/signup">Create one</Link>
+      </p>
     </div>
   );
 }

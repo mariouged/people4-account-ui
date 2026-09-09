@@ -255,6 +255,7 @@ export async function tokenRetrieve() {
 }
 
 export async function signout() {
+  // TODO call to endpoint account-api signout
   setSessionStorageItem('isAuthenticated', 'false');
   setSessionStorageItem('apiKey', '');
   setSessionStorageItem('token', '');

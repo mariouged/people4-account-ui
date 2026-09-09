@@ -33,9 +33,13 @@ function App() {
             <Route path="/sign/organization" element={<OrganizationForm />} />
             <Route path="/signin" element={<SigninForm account={account} setAccount={setAccount} />} />
             <Route path="/signup" element={<SignupForm />} />
-            <Route path="/signout" element={<SignOut />} />
             <Route path="/two-factor" element={<TwoFactorForm />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/signout" element={<SignOut setAccount={setAccount} />} />
+            {account && (
+              <>
+              <Route path="/dashboard" element={<Dashboard />} />
+              </>
+            )}
           </Routes>
         </main>
       </div>

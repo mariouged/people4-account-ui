@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { signout } from '../services/api';
 
-function SignOut() {
+function SignOut({ setAccount }) {
 
-  useCallback(() => {
+  useEffect(() => {
     signout();
+    setAccount(null);
   }, []);
 
   return (
     <div className="sign-out">
       <h3>You have been signed out.</h3>
       <p>
-        <Link to="/signin">Sign in again</Link>
+        <Link to="/sign/organization">Login again</Link>
       </p>
     </div>
   );

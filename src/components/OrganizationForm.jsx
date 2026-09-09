@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import AccountContext from '../context/AccountContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { organizationSign } from '../services/organizationSign';
 
@@ -18,6 +19,7 @@ function OrganizationForm() {
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [apiMessage, setApiMessage] = useState('');
   const navigate = useNavigate();
+  const accountContext = useContext(AccountContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,20 +34,22 @@ function OrganizationForm() {
       setErrors(errs);
       return;
     }
-    const organization = await organizationSign(fields)
+    const result = await organizationSign(fields)
+    const organization = { ...result.organization };
     if (organization.domain && organization.legalName && organization.vatId) {
       setStatus('success');
       navigate('/signin');
     } else {
       setStatus('error');
-      setApiMessage('Organization sign failed. Please retry.');
+      console.error('Organization sign failed:', result);
+      setApiMessage('Organization sign failed.');
     }
   };
 
   return (
     <div className="card">
       <h2>Organization Details</h2>
-      <form className="form" onSubmit={handleSubmit} noValidate>
+      <form className="form" onSubmit={handleSubmit} noValidate autoComplete="on">
 
         <div className="field">
           <label htmlFor="domain">Domain</label>
@@ -110,12 +114,9 @@ function OrganizationForm() {
           className="btn btn-primary"
           disabled={status === 'loading'}
         >
-          {status === 'loading' ? 'Creating account…' : 'Create Account'}
+          {status === 'loading' ? 'Loading...' : 'Login'}
         </button>
       </form>
-      <p className="form-footer">
-        Already have an account? <Link to="/signin">Sign in</Link>
-      </p>
     </div>
   );
 }

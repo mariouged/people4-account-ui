@@ -1,4 +1,5 @@
 import { hasAllSessionHeaders, generateBearerToken, getSessionItem } from './utils';
+import { authenticationHeaders } from './authentication';
 
 const organizationStruct = {
   domain: '',
@@ -15,23 +16,17 @@ export async function organizationSign({ ...organization }) {
     result.message = 'Missing required organization fields';
     return result;
   }
-  if (!hasAllSessionHeaders()) {
-    result.message = 'Invalid session headers. H0-01';
-    return result;
-  }
+  const authHeaders = await authenticationHeaders();
   try {
-    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/organization`, {
+    const response = await fetch(`${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/sign/organization`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${generateBearerToken()}`,
-        'X-Session-Id': getSessionItem('session_id') || '',
-      },
+      headers: { ...authHeaders },
       body: JSON.stringify({ ...organization }),
     });
     const res = await response.json();
-    if (res.organization && Object.keys(res.organization).length > 0) {
-      result.organization = res.organization;
+    if (res.domain && res.legalName && res.vatId) {
+      result.organization = { ...res };
+      result.message = 'OK';
     }
   } catch (err) {
     console.error(err.message || 'sign Organization failed');

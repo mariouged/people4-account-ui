@@ -256,12 +256,12 @@ export async function tokenRetrieve() {
 
 export async function signout() {
   // TODO call to endpoint account-api signout
-  setSessionStorageItem('isAuthenticated', 'false');
   setSessionStorageItem('apiKey', '');
-  setSessionStorageItem('token', '');
-  setSessionStorageItem('email', '');
-  setSessionStorageItem('hashpass', '');
   setSessionStorageItem('domain', '');
   setSessionStorageItem('legalName', '');
   setSessionStorageItem('vatId', '');
+  setSessionStorageItem('token', '');
+  setSessionStorageItem('session_id', '');
+  setSessionStorageItem('x_request_id', '');
+  setSessionStorageItem('x_id', '');
 }

@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import OrganizationForm from './components/OrganizationForm';
 import NavMenu from './components/NavMenu';
 import NavSign from './components/NavSign';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import SignupForm from './components/SignupForm';
 import SigninForm from './components/SigninForm';
 import SignOut from './components/SignOut';
@@ -12,6 +12,7 @@ import { AuthenticatedContext } from './context/AuthenticatedContext';
 
 function App() {
   const isAuthenticated = useContext(AuthenticatedContext);
+  const [account, setAccount] = useState(null);
 
   return (
     <BrowserRouter basename="/account-ui">
@@ -19,7 +20,7 @@ function App() {
         <header className="app-header">
           <h1>Simply Compliance</h1>
           <nav>
-            {isAuthenticated ? (
+            {account ? (
               <NavMenu />
             ) : (
               <NavSign />
@@ -30,7 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/signin" replace />} />
             <Route path="/sign/organization" element={<OrganizationForm />} />
-            <Route path="/signin" element={<SigninForm />} />
+            <Route path="/signin" element={<SigninForm account={account} setAccount={setAccount} />} />
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/signout" element={<SignOut />} />
             <Route path="/two-factor" element={<TwoFactorForm />} />

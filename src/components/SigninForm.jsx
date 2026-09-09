@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userSign } from '../services/userSign';
 
-function SigninForm() {
+function SigninForm({ account, setAccount }) {
   const [fields, setFields] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle');
@@ -35,6 +35,7 @@ function SigninForm() {
       password: fields.password,
     });
     if (result.ok) {
+      setAccount(result.account);
       navigate('/dashboard');
       return;
     } else {

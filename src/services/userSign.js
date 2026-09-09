@@ -24,6 +24,13 @@ export async function userSign({ email, password }) {
       setSessionItem('apiKey', res.apiKey);
       result.message = 'OK';
       result.ok = true;
+      result.account = { 
+        email: email,
+        apiKey: res.apiKey,
+        domain: res.domain,
+        legalName: res.legalName,
+        vatId: res.vatId,
+      };
     }
   } catch (err) {
     console.error(err.message || 'sign User failed');

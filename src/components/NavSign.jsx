@@ -4,7 +4,6 @@ function NavSign() {
   return (
     <nav>
       <Link to="/sign/organization">Login</Link>
-      <Link to="/signin">Sign In</Link>
       <Link to="/signup">Sign Up</Link>
     </nav>
   );

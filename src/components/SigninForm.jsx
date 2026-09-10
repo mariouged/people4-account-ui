@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { userSign } from '../services/userSign';
-
+import { signinApi } from '../services/signinApi';
 
 function SigninForm({ account, setAccount }) {
   const [fields, setFields] = useState({ email: '', password: '' });
@@ -30,7 +29,7 @@ function SigninForm({ account, setAccount }) {
       setErrors(errs);
       return;
     }
-    const result = await userSign({
+    const result = await signinApi({
       email: fields.email,
       // TODO crypto passwd https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/generateKey
       password: fields.password,

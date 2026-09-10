@@ -2,8 +2,9 @@ import { authenticationHeaders } from './authentication';
 import { setSessionItem } from './utils';
 import { ACCOUNT } from '../types/account';
 
-export async function userSign({ email, password }) {
+export async function signinApi({ email, password }) {
   const result = {
+    account: { ...ACCOUNT },
     message: '',
     ok: false,
   };
@@ -14,7 +15,8 @@ export async function userSign({ email, password }) {
   const payload = { email, password }; 
   const authHeaders = await authenticationHeaders();
   try {
-    const endpoint = `${import.meta.env.VITE_ACCOUNT_API_URL_BASE}/signin`;
+    const path = '/signin';
+    const endpoint = `${import.meta.env.VITE_ACCOUNT_API_URL_BASE}${path}`;
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { ...authHeaders },
@@ -26,7 +28,6 @@ export async function userSign({ email, password }) {
       result.message = 'OK';
       result.ok = true;
       result.account = {
-        ...ACCOUNT,
         email: email,
         apiKey: res.apiKey,
         domain: res.domain,

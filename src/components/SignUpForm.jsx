@@ -1,25 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signup, setSessionStorageItem } from '../services/api';
+import { signupApi } from '../services/signupApi';
+import { SIGNUP_FIELDS, validateSignupFields } from '../types/signup';
 
-const INITIAL = { legalName: '', vatId: '', domain: '', email: '', password: '' };
-
-function validate(fields) {
-  const errs = {};
-  if (!fields.legalName.trim()) errs.legalName = 'Legal name is required';
-  if (!fields.vatId.trim()) errs.vatId = 'VAT ID is required';
-  if (!fields.domain.trim()) errs.domain = 'Domain is required';
-  if (!fields.email.trim()) errs.email = 'Email is required';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email))
-    errs.email = 'Enter a valid email';
-  if (!fields.password) errs.password = 'Password is required';
-  else if (fields.password.length < 8)
-    errs.password = 'Password must be at least 8 characters';
-  return errs;
-}
-
-function SignupForm() {
-  const [fields, setFields] = useState(INITIAL);
+function SignUpForm({ account, setAccount }) {
+  const [fields, setFields] = useState(SIGNUP_FIELDS);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [apiMessage, setApiMessage] = useState('');
@@ -33,17 +18,21 @@ function SignupForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate(fields);
+    const errs = validateSignupFields(fields);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
     }
-    // NOT do the signup here, instead:
-    // store the fields in sessionStorage and navigate to /two-factor
-    setSessionStorageItem('signupFields', JSON.stringify(fields));
-    setSessionStorageItem('email', fields.email);
-    setSessionStorageItem('conversionFunnel', 'signup');
-    navigate('/two-factor');
+    const result = await signupApi(fields);
+    if (result.ok) {
+      setStatus('success');
+      setApiMessage(result.message);
+      setAccount(result.account);
+      navigate('/dashboard');
+    } else {
+      setStatus('error');
+      setApiMessage(result.message);
+    }
   };
 
   return (
@@ -51,6 +40,23 @@ function SignupForm() {
       <h2>Create Account</h2>
       <form className="form" onSubmit={handleSubmit} noValidate>
         <div className="field">
+          <div className="field">
+            <label htmlFor="domain">Domain</label>
+            <input
+              id="domain"
+              name="domain"
+              type="text"
+              value={fields.domain}
+              onChange={handleChange}
+              className={errors.domain ? 'error' : ''}
+              placeholder="acme.com"
+              aria-describedby={errors.domain ? 'domain-error' : undefined}
+            />
+            {errors.domain && (
+              <span id="domain-error" className="field-error">{errors.domain}</span>
+            )}
+          </div>
+
           <label htmlFor="legalName">Legal Name</label>
           <input
             id="legalName"
@@ -81,23 +87,6 @@ function SignupForm() {
           />
           {errors.vatId && (
             <span id="vatId-error" className="field-error">{errors.vatId}</span>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="domain">Domain</label>
-          <input
-            id="domain"
-            name="domain"
-            type="text"
-            value={fields.domain}
-            onChange={handleChange}
-            className={errors.domain ? 'error' : ''}
-            placeholder="acme.com"
-            aria-describedby={errors.domain ? 'domain-error' : undefined}
-          />
-          {errors.domain && (
-            <span id="domain-error" className="field-error">{errors.domain}</span>
           )}
         </div>
 
@@ -147,7 +136,7 @@ function SignupForm() {
           className="btn btn-primary"
           disabled={status === 'loading'}
         >
-          {status === 'loading' ? 'Creating account…' : 'Create Account'}
+          {status === 'loading' ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
       <p className="form-footer">
@@ -157,4 +146,4 @@ function SignupForm() {
   );
 }
 
-export default SignupForm;
+export default SignUpForm;

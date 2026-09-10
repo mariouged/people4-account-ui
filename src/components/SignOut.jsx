@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import { signout } from '../services/api';
+import { signoutApi } from '../services/signoutApi';
 
-function SignOut({ setAccount }) {
+function SignOut({ account, setAccount }) {
 
   useEffect(() => {
-    signout();
+    signoutApi(account);
     setAccount(null);
   }, []);
 

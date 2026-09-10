@@ -3,14 +3,13 @@ import OrganizationForm from './components/OrganizationForm';
 import NavMenu from './components/NavMenu';
 import NavSign from './components/NavSign';
 import { useState } from 'react';
-import SignupForm from './components/SignupForm';
+import SignUpForm from './components/SignUpForm';
 import SigninForm from './components/SigninForm';
 import SignOut from './components/SignOut';
-import TwoFactorForm from './components/TwoFactorForm';
 import Dashboard from './components/Dashboard';
 
 function App() {
-  const [account, setAccount] = useState(null);
+  const [account, setAccount] = useState(null); // TODO refactor to Context
 
   return (
     <BrowserRouter basename="/account-ui">
@@ -30,9 +29,8 @@ function App() {
             <Route path="/" element={<Navigate to="/signin" replace />} />
             <Route path="/sign/organization" element={<OrganizationForm />} />
             <Route path="/signin" element={<SigninForm account={account} setAccount={setAccount} />} />
-            <Route path="/signup" element={<SignupForm />} />
-            <Route path="/two-factor" element={<TwoFactorForm />} />
-            <Route path="/signout" element={<SignOut setAccount={setAccount} />} />
+            <Route path="/signup" element={<SignUpForm account={account} setAccount={setAccount} />} />
+            <Route path="/signout" element={<SignOut account={account} setAccount={setAccount} />} />
             <Route path="/dashboard" element={<Dashboard account={account} setAccount={setAccount} />} />
           </Routes>
         </main>

@@ -45,7 +45,7 @@ function OrganizationForm() {
 
   return (
     <div className="card">
-      <h2>Organization Details</h2>
+      <h2>Organization Login</h2>
       <form className="form" onSubmit={handleSubmit} noValidate autoComplete="on">
 
         <div className="field">

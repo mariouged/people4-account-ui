@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import OrganizationForm from './components/OrganizationForm';
 import NavMenu from './components/NavMenu';
 import NavSign from './components/NavSign';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import SignupForm from './components/SignupForm';
 import SigninForm from './components/SigninForm';
 import SignOut from './components/SignOut';
@@ -33,11 +33,7 @@ function App() {
             <Route path="/signup" element={<SignupForm />} />
             <Route path="/two-factor" element={<TwoFactorForm />} />
             <Route path="/signout" element={<SignOut setAccount={setAccount} />} />
-            {account && (
-              <>
-              <Route path="/dashboard" element={<Dashboard account={account} />} />
-              </>
-            )}
+            <Route path="/dashboard" element={<Dashboard account={account} setAccount={setAccount} />} />
           </Routes>
         </main>
       </div>

@@ -1,43 +1,24 @@
 import { useEffect, useState } from "react";
-import { tokenRetrieve } from '../services/api';
+import { fetchInvoices } from '../services/invoiceApi';
 
-function InvoicesList() {
+function InvoicesList({ account, setAccount }) {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const token = await tokenRetrieve();
-        if (!token) {
-          throw new Error("401 (Unauthorized) fetch invoices");
-        }
 
-        const response = await fetch(
-          "https://app.people4.eu/invoice-api/invoice/v1",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        setInvoices(Array.isArray(data) ? data : data.items ?? []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    const getInvoices = async () => {
+      setLoading(true);
+      const result = await fetchInvoices({ account, setAccount });
+      setLoading(false);
+      setInvoices(result.invoices);
+      setError(result.ok ? null : result.message);
     };
 
-    fetchInvoices();
-  }, []);
+    getInvoices();
+
+  }, [account, setAccount]);
 
   const formatDate = (value) => {
     if (!value) return "";
@@ -62,7 +43,7 @@ function InvoicesList() {
     return (
       <div className="card">
         <h2>Invoices</h2>
-        <p className="error">Error loading invoices: {error}</p>
+        {error && <p className="error">{error}</p>}
       </div>
     );
   }

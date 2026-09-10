@@ -1,6 +1,8 @@
 import InvoicesList from "./InvoicesList";
 
-function Dashboard({ account }) {
+function Dashboard({ account, setAccount }) {
+
+  if (!account) return (<p>No account available. Please Log in.</p>);
 
   return (
     <div className="dashboard">
@@ -14,7 +16,7 @@ function Dashboard({ account }) {
         </ul>
       </div>
       <div className="todo-invoices-list-wrapper">
-        <InvoicesList />
+        <InvoicesList account={account} setAccount={setAccount}/>
       </div>
     </div>
   );

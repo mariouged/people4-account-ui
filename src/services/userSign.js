@@ -1,5 +1,6 @@
 import { authenticationHeaders } from './authentication';
 import { setSessionItem } from './utils';
+import { ACCOUNT } from '../types/account';
 
 export async function userSign({ email, password }) {
   const result = {
@@ -24,7 +25,8 @@ export async function userSign({ email, password }) {
       setSessionItem('apiKey', res.apiKey);
       result.message = 'OK';
       result.ok = true;
-      result.account = { 
+      result.account = {
+        ...ACCOUNT,
         email: email,
         apiKey: res.apiKey,
         domain: res.domain,

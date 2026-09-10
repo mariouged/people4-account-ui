@@ -1,6 +1,7 @@
 import { hasAllSessionHeaders, setSessionItem, getSessionItem } from './utils';
+import { ACCOUNT } from '../types/account';
 
-async function authenticationHeaders() {
+export async function authenticationHeaders() {
   if (!hasAllSessionHeaders()) {
     const headersAndCookies = await headersAndCookiesGenerate();
     setSessionItem('session_id', headersAndCookies.session_id);
@@ -39,4 +40,51 @@ async function headersAndCookiesGenerate() {
   }
 }
 
-export { authenticationHeaders };
+export async function fetchToken({ account, setAccount }) {
+  if (account.token) {
+    return account.token;
+  }
+  let resultToken = '';
+  if (!account.apiKey || !account.domain || !account.legalName || !account.vatId) {
+    const err = new Error('Account properties are required');
+    err.status = 500;
+    throw err;
+  }
+  try {
+    const endpoint = `${import.meta.env.VITE_AUTH_API_URL_BASE}/token`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${account.apiKey}`,
+    };
+    const payload = {
+      domain: account.domain || '',
+      legalName: account.legalName || '',
+      vatId: account.vatId || '',
+    };
+    const response = await fetch(endpoint, {
+      method: 'PUT',
+      headers: headers,
+      body: JSON.stringify(payload),
+    });
+    const res = await response.json();
+    if (res.token) {
+      setAccount({
+        ...ACCOUNT,
+        ...account,
+        token: res.token
+      });
+      resultToken = res.token;
+    }
+  } catch (err) {
+    console.error(err.message || 'token retrieve failed');
+    err.status = err.status || 401;
+    throw err;
+  }
+  return resultToken;
+}
+
+export function headersToken(token) {
+  return {
+    'Authorization': `Bearer ${token}`,
+  };
+}
